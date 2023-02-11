@@ -20,6 +20,10 @@ contract ShippingAgreement is Ownable {
     uint max_temp = 60; // Fahrenheit
     uint max_acc = 2;
 
+    // Final values at receipt
+    uint receipt_temp;
+    uint receipt_acc;
+
     address public package_address;
     address payable public sender;
     address payable public shipper;
@@ -46,20 +50,10 @@ contract ShippingAgreement is Ownable {
         reward_amount = _reward_amount;
 
         // Deposit reward in smart contract
+
         require(
-            IERC20(_reward_token_address).balanceOf(msg.sender) >=
-                reward_amount,
-            "Your token amount must be greater then you are trying to deposit"
-        );
-        require(
-            IERC20(_reward_token_address).approve(address(this), reward_amount)
-        );
-        require(
-            IERC20(_reward_token_address).transferFrom(
-                msg.sender,
-                address(this),
-                reward_amount
-            )
+            IERC20(reward_token_address).transfer(address(this), reward_amount),
+            "Depositing reward failed"
         );
 
         fee_amount = _reward_amount / 100;
@@ -75,8 +69,6 @@ contract ShippingAgreement is Ownable {
     ) public {
         require(msg.sender == recipient, "You are not the recipient"); // Only the recipient can receive the shipment
 
-        uint penalty = 0;
-
         // Check signature
         require(
             ECDSA.recover(
@@ -88,27 +80,45 @@ contract ShippingAgreement is Ownable {
 
         // For each requirement decrease reward and increase penalty
         // checking to see if read temp has exceeded the set max_temp, if so removing a percent of the reward as penalty
-        if (_temp >= max_temp) {
-            uint penaltytemp = 0;
-            penaltytemp = _temp - max_temp;
+        if (_temp > max_temp) {
+            uint penaltytemp = _temp - max_temp;
             penalty_amount += penaltytemp * (reward_amount / 100);
         }
 
         // checking to see if read acceleration has exceeded the set max_accel, if so removing a percent of the reward as penalty
-        if (_acc >= max_acc) {
-            uint penaltyacc = 0;
-            penaltyacc = _acc - max_acc;
+        if (_acc > max_acc) {
+            uint penaltyacc = _acc - max_acc;
             penalty_amount += penaltyacc * (reward_amount / 10);
         }
 
-        if (penalty >= (reward_amount - fee_amount)) {
+        if (penalty_amount >= (reward_amount - fee_amount)) {
             reward_amount = 0;
             penalty_amount = reward_amount - fee_amount;
         } else {
-            reward_amount = reward_amount - fee_amount - penalty;
+            reward_amount = reward_amount - fee_amount - penalty_amount;
         }
 
+        receipt_temp = _temp;
+        receipt_acc = _acc;
+
         state = shipping_states.RECEIVED;
+    }
+
+    function getDeliverySummary()
+        public
+        view
+        returns (uint, uint, uint, uint, uint, uint, uint)
+    {
+        require(state == shipping_states.RECEIVED, "Shipment not received"); // Shipment must be received
+        return (
+            receipt_temp,
+            max_temp,
+            receipt_acc,
+            max_acc,
+            reward_amount,
+            penalty_amount,
+            fee_amount
+        );
     }
 
     // The shipper can withdraw the reward when the shipment is received
@@ -140,5 +150,13 @@ contract ShippingAgreement is Ownable {
             IERC20(reward_token_address).transfer(msg.sender, fee_amount),
             "Withdrawing fees failed"
         );
+    }
+
+    function reset() public {
+        reward_amount = 1000;
+        penalty_amount = 0;
+        receipt_temp = 0;
+        receipt_acc = 0;
+        state = shipping_states.SHIPPING;
     }
 }
