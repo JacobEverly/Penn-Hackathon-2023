@@ -5,6 +5,20 @@ const {
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 
+
+// describe("Token contract", function () {
+//   it("Deployment should assign the total supply of tokens to the owner", async function () {
+//     const [owner] = await ethers.getSigners();
+
+//     const Token = await ethers.getContractFactory("Token");
+
+//     const hardhatToken = await Token.deploy();
+
+//     const ownerBalance = await hardhatToken.balanceOf(owner.address);
+//     expect(await hardhatToken.totalSupply()).to.equal(ownerBalance);
+//   });
+// });
+
 describe("Lock", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
