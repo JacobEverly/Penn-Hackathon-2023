@@ -24,3 +24,7 @@ https://github.com/JacobEverly/trac3y-contracts/blob/main/contracts/USDStable.so
 # Link to Front End
 
 https://github.com/an53n/trac3y-frontend
+
+# Link to physical prototype code
+
+https://github.com/JacobEverly/Trac3y-Prototype
