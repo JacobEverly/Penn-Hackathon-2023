@@ -1,12 +1,14 @@
 # Penn-Hackathon-2023
 
-Code for Penn Hackathon project "Trac3y, aiming to validate supply chain requirements."
+Code for Penn Hackathon project "Trac3y, aiming to validate supply chain requirements and reduce disputes in the space.
+
+# Link to Trac3y Pitch Deck
+https://bit.ly/trac3y_pitch
 
 # Demo of Product
 https://user-images.githubusercontent.com/112036223/218285494-542ed039-e06b-450d-a7fd-c3ede92ca284.mov
 
-# Link to Trac3y Pitch Deck
-https://bit.ly/trac3y_pitch
+
 # Back-End Smart Contracts in Solodity
 
 Shipping Agreement
